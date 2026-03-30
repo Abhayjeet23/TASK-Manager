@@ -1,0 +1,14 @@
+{
+  "name": "mern-taskmanager",
+  "version": "1.0.0",
+  "description": "Full-stack MERN Task Manager — core concepts reference project",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
