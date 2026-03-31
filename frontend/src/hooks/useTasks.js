@@ -5,7 +5,14 @@
 // ============================================================
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import api from "../utils/api";
+
+const getHeaders = () => {
+  const token = localStorage.getItem("token");
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+  };
+};
 
 const useTasks = (filters = {}) => {
   const [tasks, setTasks] = useState([]);
@@ -24,11 +31,25 @@ const useTasks = (filters = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get("/tasks", { params });
+      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks`);
+      if (params) {
+        Object.keys(params).forEach(key => {
+          if (params[key] !== undefined && params[key] !== "") {
+            url.searchParams.append(key, params[key]);
+          }
+        });
+      }
+      const response = await fetch(url.toString(), {
+        headers: getHeaders(),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to load tasks");
+      }
       setTasks(data.tasks);
       setPagination({ page: data.page, pages: data.pages, total: data.total });
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to load tasks");
+      setError(err.message || "Failed to load tasks");
     } finally {
       setLoading(false);
     }
@@ -36,7 +57,13 @@ const useTasks = (filters = {}) => {
 
   const fetchStats = useCallback(async () => {
     try {
-      const { data } = await api.get("/tasks/stats");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks/stats`, {
+        headers: getHeaders(),
+      });
+      if (!response.ok) {
+        throw new Error("Stats fetch failed");
+      }
+      const data = await response.json();
       setStats(data);
     } catch (err) {
       console.error("Stats fetch failed", err);
@@ -62,37 +89,60 @@ const useTasks = (filters = {}) => {
   // ── CRUD operations ─────────────────────────────────────────
   const createTask = async (taskData) => {
     try {
-      const { data } = await api.post("/tasks", taskData);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks`, {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(taskData)
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create task");
+      }
       // Optimistic update: prepend new task without refetching
       setTasks((prev) => [data.task, ...prev]);
       fetchStats();
       return { success: true, task: data.task };
     } catch (err) {
-      return { success: false, error: err.response?.data?.message };
+      return { success: false, error: err.message };
     }
   };
 
   const updateTask = async (id, taskData) => {
     try {
-      const { data } = await api.put(`/tasks/${id}`, taskData);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks/${id}`, {
+        method: "PUT",
+        headers: getHeaders(),
+        body: JSON.stringify(taskData)
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update task");
+      }
       setTasks((prev) =>
         prev.map((t) => (t._id === id ? data.task : t))
       );
       fetchStats();
       return { success: true, task: data.task };
     } catch (err) {
-      return { success: false, error: err.response?.data?.message };
+      return { success: false, error: err.message };
     }
   };
 
   const deleteTask = async (id) => {
     try {
-      await api.delete(`/tasks/${id}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks/${id}`, {
+        method: "DELETE",
+        headers: getHeaders()
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to delete task");
+      }
       setTasks((prev) => prev.filter((t) => t._id !== id));
       fetchStats();
       return { success: true };
     } catch (err) {
-      return { success: false, error: err.response?.data?.message };
+      return { success: false, error: err.message };
     }
   };
 

@@ -5,7 +5,6 @@
 // ============================================================
 
 import React, { createContext, useContext, useReducer, useEffect } from "react";
-import api from "../utils/api";
 
 // ─── 1. CREATE CONTEXT ───────────────────────────────────────
 const AuthContext = createContext(null);
@@ -63,13 +62,23 @@ export const AuthProvider = ({ children }) => {
   const register = async (formData) => {
     dispatch({ type: "AUTH_LOADING" });
     try {
-      const { data } = await api.post("/auth/register", formData);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       dispatch({ type: "LOGIN_SUCCESS", payload: data });
       return { success: true };
     } catch (err) {
-      const msg = err.response?.data?.message || "Registration failed";
+      const msg = err.message || "Registration failed";
       dispatch({ type: "AUTH_ERROR", payload: msg });
       return { success: false, error: msg };
     }
@@ -78,13 +87,23 @@ export const AuthProvider = ({ children }) => {
   const login = async (formData) => {
     dispatch({ type: "AUTH_LOADING" });
     try {
-      const { data } = await api.post("/auth/login", formData);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       dispatch({ type: "LOGIN_SUCCESS", payload: data });
       return { success: true };
     } catch (err) {
-      const msg = err.response?.data?.message || "Login failed";
+      const msg = err.message || "Login failed";
       dispatch({ type: "AUTH_ERROR", payload: msg });
       return { success: false, error: msg };
     }
