@@ -31,7 +31,7 @@ const useTasks = (filters = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks`);
+      const url = new URL(`${process.env.REACT_APP_API_URL}/api/tasks`);
       if (params) {
         Object.keys(params).forEach(key => {
           if (params[key] !== undefined && params[key] !== "") {
@@ -57,7 +57,7 @@ const useTasks = (filters = {}) => {
 
   const fetchStats = useCallback(async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks/stats`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tasks/stats`, {
         headers: getHeaders(),
       });
       if (!response.ok) {
@@ -89,7 +89,7 @@ const useTasks = (filters = {}) => {
   // ── CRUD operations ─────────────────────────────────────────
   const createTask = async (taskData) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tasks`, {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify(taskData)
@@ -109,7 +109,7 @@ const useTasks = (filters = {}) => {
 
   const updateTask = async (id, taskData) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tasks/${id}`, {
         method: "PUT",
         headers: getHeaders(),
         body: JSON.stringify(taskData)
@@ -130,7 +130,7 @@ const useTasks = (filters = {}) => {
 
   const deleteTask = async (id) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tasks/${id}`, {
         method: "DELETE",
         headers: getHeaders()
       });

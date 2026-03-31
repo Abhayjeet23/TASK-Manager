@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (formData) => {
     dispatch({ type: "AUTH_LOADING" });
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (formData) => {
     dispatch({ type: "AUTH_LOADING" });
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
