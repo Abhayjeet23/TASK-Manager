@@ -21,7 +21,6 @@ const app = express();
 app.use(express.json());
 
 // 2. Allow cross-origin requests (React dev server on :3000 → API on :5000)
-const cors = require("cors");
 
 app.use(cors({
   origin: process.env.CLIENT_URL,
