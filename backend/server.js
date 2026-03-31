@@ -21,12 +21,12 @@ const app = express();
 app.use(express.json());
 
 // 2. Allow cross-origin requests (React dev server on :3000 → API on :5000)
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
-    credentials: true,
-  })
-);
+const cors = require("cors");
+
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true
+}));
 
 // 3. Simple request logger (custom middleware)
 app.use((req, _res, next) => {
