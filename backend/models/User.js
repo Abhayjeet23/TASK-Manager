@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Name is required"],   // custom error message
+      required: [true, "Name is required"], // custom error message
       trim: true,
       minlength: [2, "Name must be at least 2 characters"],
       maxlength: [50, "Name cannot exceed 50 characters"],
@@ -21,8 +21,8 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: [true, "Email is required"],
-      unique: true,          // creates a unique index in MongoDB
-      lowercase: true,       // auto-transform before saving
+      unique: true, // creates a unique index in MongoDB
+      lowercase: true, // auto-transform before saving
       trim: true,
       match: [/\S+@\S+\.\S+/, "Please provide a valid email"],
     },
@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters"],
-      select: false,         // never return password in queries by default
+      select: false, // never return password in queries by default
     },
     avatar: {
       type: String,
@@ -38,15 +38,20 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin"],   // only these values allowed
+      enum: ["user", "admin"], // only these values allowed
       default: "user",
+    },
+    refreshToken: {
+      type: String,
+      default: null,
+      select: false, // never return refresh token in queries by default
     },
   },
   {
     // ── Schema Options ──────────────────────────────────────
-    timestamps: true,   // auto-add createdAt & updatedAt fields
-    toJSON: { virtuals: true },   // include virtuals in JSON output
-  }
+    timestamps: true, // auto-add createdAt & updatedAt fields
+    toJSON: { virtuals: true }, // include virtuals in JSON output
+  },
 );
 
 // ─── VIRTUAL FIELD ────────────────────────────────────────────

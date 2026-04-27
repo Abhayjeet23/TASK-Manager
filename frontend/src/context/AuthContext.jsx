@@ -38,7 +38,7 @@ const authReducer = (state, action) => {
 const initialState = {
   user: null,
   isAuthenticated: false,
-  loading: true,   // true initially — we check localStorage on mount
+  loading: true, // true initially — we check localStorage on mount
   error: null,
 };
 
@@ -49,9 +49,10 @@ export const AuthProvider = ({ children }) => {
   // Check for existing token on app load
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const refreshToken = localStorage.getItem("refreshToken");
     const user = localStorage.getItem("user");
 
-    if (token && user) {
+    if (token && refreshToken && user) {
       dispatch({ type: "LOGIN_SUCCESS", payload: { user: JSON.parse(user) } });
     } else {
       dispatch({ type: "LOGOUT" });
@@ -62,18 +63,22 @@ export const AuthProvider = ({ children }) => {
   const register = async (formData) => {
     dispatch({ type: "AUTH_LOADING" });
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
         },
-        body: JSON.stringify(formData)
-      });
+      );
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || "Registration failed");
       }
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
       localStorage.setItem("user", JSON.stringify(data.user));
       dispatch({ type: "LOGIN_SUCCESS", payload: data });
       return { success: true };
@@ -87,18 +92,22 @@ export const AuthProvider = ({ children }) => {
   const login = async (formData) => {
     dispatch({ type: "AUTH_LOADING" });
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
         },
-        body: JSON.stringify(formData)
-      });
+      );
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
       localStorage.setItem("user", JSON.stringify(data.user));
       dispatch({ type: "LOGIN_SUCCESS", payload: data });
       return { success: true };
@@ -111,6 +120,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
     dispatch({ type: "LOGOUT" });
   };

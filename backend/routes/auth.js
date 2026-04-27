@@ -5,7 +5,13 @@
 
 const express = require("express");
 const router = express.Router();
-const { register, login, getMe } = require("../controllers/authController");
+const {
+  register,
+  login,
+  getMe,
+  refresh,
+  logout,
+} = require("../controllers/authController");
 const { protect } = require("../middleware/auth");
 const { registerRules, loginRules } = require("../middleware/validate");
 
@@ -13,6 +19,8 @@ const { registerRules, loginRules } = require("../middleware/validate");
 // Each item runs in order before the controller
 router.post("/register", registerRules, register);
 router.post("/login", loginRules, login);
-router.get("/me", protect, getMe);   // protect runs before getMe
+router.post("/refresh", refresh); // refresh endpoint is PUBLIC
+router.get("/me", protect, getMe); // protect runs before getMe
+router.post("/logout", protect, logout); // logout endpoint requires auth
 
 module.exports = router;
