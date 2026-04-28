@@ -22,9 +22,21 @@ app.use(express.json());
 
 // 2. Allow cross-origin requests (React dev server on :3000 → API on :5000)
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "http://localhost:3000",
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. curl / Postman) or from the whitelist
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    }
+  },
+  credentials: true,
 }));
 
 // 3. Simple request logger (custom middleware)
@@ -38,6 +50,8 @@ app.use((req, _res, next) => {
 
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/tasks", require("./routes/tasks"));
+app.use("/api/ai", require("./routes/ai"));
+
 
 // Health-check route
 app.get("/", (_req, res) => res.json({ message: "MERN API is running 🚀" }));

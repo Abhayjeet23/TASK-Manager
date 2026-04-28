@@ -9,6 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import useTasks from "../hooks/useTasks";
 import TaskCard from "../components/TaskCard";
 import TaskForm from "../components/TaskForm";
+import AIAssistant from "../components/AIAssistant";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -95,6 +96,11 @@ const Dashboard = () => {
         <button className="btn-primary" onClick={() => setShowForm((v) => !v)}>
           {showForm ? "✕ Cancel" : "+ New Task"}
         </button>
+      </div>
+
+      {/* ── AI ASSISTANT ─────────────────────────────────────── */}
+      <div className="ai-assistant-wrapper">
+        <AIAssistant onTaskCreated={() => setFilters((p) => ({ ...p, page: 1 }))} />
       </div>
 
       {/* ── TASK FORM (conditional render) ─────────────────── */}

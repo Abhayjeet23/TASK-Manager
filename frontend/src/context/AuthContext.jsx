@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: "LOGOUT" });
   };
 
-  const clearError = () => dispatch({ type: "CLEAR_ERROR" });
+  const clearError = React.useCallback(() => dispatch({ type: "CLEAR_ERROR" }), []);
 
   // ── Context Value ───────────────────────────────────────────
   return (
